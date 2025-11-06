@@ -44,3 +44,9 @@ To do:
 
 Observations:
 - loading data into a batch takes forever haha
+- So with my meager RTX 4070 gpu, I'm gonna have to freeze most model parameters, using something like this:
+for p in model.parameters():
+    p.requires_grad = False
+
+then, I'll unfreeze the lightweight parts,
+
