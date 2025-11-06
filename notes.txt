@@ -1,0 +1,79 @@
+surface variables: is a dict with keys (2t, 10u, v10, msl)
+each key maps to a tensor of shape (a, b, c, d)
+
+2t: 2 m temperature
+10u: 10 m u-component of wind
+v10: 10 m v-component of wind
+msl: mean sea level pressure
+
+Each surface variables tensor has shape (a, b, c, d) where:
+a: batch size (number of samples)
+b: time steps
+c: latitude
+d: longitude
+
+
+
+
+
+
+static variables: is a dict with keys (lsm, z, slt)
+each key maps to a tensor of shape (a, b)
+
+lsm: land-sea mask (0=sea, 1=land)
+z: geopotential height (elevation)
+slt: soil type
+
+Each static variables tensor has shape (a, b) where:
+a: latitude
+b: longitude
+
+
+
+
+
+
+
+atmospheric variables:
+z: geopotential height
+u: u-component of wind
+v: v-component of wind
+t: temperature
+q: specific humidity
+
+Each atmospheric variables tensor has shape (a, b, c, d, e) where:
+a: batch size
+b: time steps
+c, number of atmospheric pressure levels
+d: latitude
+e: longitude
+
+
+
+
+
+metadata=Metadata(
+        lat=torch.linspace(90, -90, 17),
+        lon=torch.linspace(0, 360, 32 + 1)[:-1],
+        time=(datetime(2020, 6, 1, 12, 0),),
+        atmos_levels=(100, 250, 500, 850),
+    )
+This defines the coordinate metadata for your batch:
+- lat: 17 latitudes from 90° N to −90° S
+- lon: 32 longitudes from 0° to 360° (excluding the duplicate at 360°)
+- time: just one timestamp (2020-06-01 12:00 UTC)
+- atmos_levels: pressure levels (hPa)
+
+The model uses this metadata to understand where and when each grid point lies.
+
+
+
+
+
+
+
+btw, for atmospheric pressure levels: (hPa = hectopascals)
+100 hPa → lower stratosphere
+250 hPa → upper troposphere (jet level)
+500 hPa → mid-troposphere
+850 hPa → lower troposphere
