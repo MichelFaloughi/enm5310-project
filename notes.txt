@@ -68,8 +68,12 @@ The model uses this metadata to understand where and when each grid point lies.
 
 
 
-
-
+btw, prediction variables are:
+tp → total precipitation
+pr → precipitation rate
+rain_rate → rain rate
+GraphCast, Pangu-Weather, FourCastNet, and some other models predict some of these variables
+aurora doesn't
 
 
 btw, for atmospheric pressure levels: (hPa = hectopascals)
@@ -77,3 +81,42 @@ btw, for atmospheric pressure levels: (hPa = hectopascals)
 250 hPa → upper troposphere (jet level)
 500 hPa → mid-troposphere
 850 hPa → lower troposphere
+
+
+
+
+
+model.load_checkpoint("microsoft/aurora", "aurora-0.25-small-pretrained.ckpt")
+
+the documentation for this function is:
+def load_checkpoint(
+        self,
+        repo: Optional[str] = None,
+        name: Optional[str] = None,
+        revision: Optional[str] = None,
+        strict: bool = True,
+    ) -> None:
+        """Load a checkpoint from HuggingFace.
+
+        Args:
+            repo (str, optional): Name of the repository of the form `user/repo`.
+            name (str, optional): Path to the checkpoint relative to the root of the repository,
+                e.g. `checkpoint.cpkt`.
+            revision (str, optional): Version hash of the Huggingface git repository commit.
+            strict (bool, optional): Error if the model parameters are not exactly equal to the
+                parameters in the checkpoint. Defaults to `True`.
+        """
+        repo = repo or self.default_checkpoint_repo
+        name = name or self.default_checkpoint_name
+        revision = revision or self.default_checkpoint_revision
+        path = hf_hub_download(repo_id=repo, filename=name, revision=revision)
+        self.load_checkpoint_local(path, strict=strict)
+
+
+
+
+model.eval() sets the model to evaluation mode (disables dropout, etc.)
+this means we're done training and just want to make predictions (inference)
+
+with torch.inference_mode(): is a context manager that disables gradient calculations
+this saves memory and speeds up computations during inference since we don't need gradients
