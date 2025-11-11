@@ -4,7 +4,7 @@ My final project for the ENM 5310 class: Data-driven Modelling and Probabilistic
 Questions for Prof. Paris:
 - 'A100 with 80 GB' in the finetuning part of Aurora
 - AuroraSmallPretrained apparently is only good for debugging, nothing else. They say we don't recommend any other use. Should I still fine-tune this ? I have no other choice do I.
-
+- maybe theme the project: 'how good can we predict rainfall after finetuning with an 8gb gpu'
 
 
 Questions for me later:
