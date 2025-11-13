@@ -1,2 +1,3 @@
 TODO:
 - Maybe come up with a function to pretty print a Batch into a dataframe or tabular data of some sort. Is that feasible ? Memory-wise ? Is it already done ? Check the Batch.py file
+- train on data after 2021, since that's when Aurora stopped seeing data (maybe 2022-2025) ERA5 is still probably file, just not from 1979-2021
