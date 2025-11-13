@@ -1,0 +1,38 @@
+Proposal:
+- train on data after 2021, since that's when Aurora stopped seeing data (maybe 2022-2025) ERA5 is still probably file, just not from 1979-2021
+- probably need a specific region or grid point ?
+- Use AuroraSmallPretrained ? they don't recommend using it, but maybe for fine-tuning it's okay ? What did the guys from the paper use ?
+- Since I have a small gpu, I should do PARAMETER-EFFICIENT FINE_TUNING (PEFT) instead of full fine-tuning (e.g. LoRA, or freezing some layers). Should I used the PEFT library from HuggingFace ? or the fine tuning functions from Aurora directly ? or both ?
+
+
+
+
+Questions:
+- What exactly is LoRA
+answer: Low-Rank Adaptation of Large Language Models, meaning that instead of updating all the weights of the model during fine-tuning, you only update a small number of additional weights that are added to the model. This reduces the number of trainable parameters and makes fine-tuning more efficient.
+- Is this different than freezing some of the parameters of the model during fine-tuning ?
+answer: Yes, freezing parameters means that you do not update them at all during fine-tuning, while LoRA adds new parameters that are trained while the original parameters remain unchanged.
+- How to implement LoRA with Aurora ? Is there an example anywhere ?
+answer: Not that I know of, but you can use the PEFT library from HuggingFace to implement LoRA with Aurora. You would need to define a LoRA configuration and then wrap the Aurora model with it.
+
+
+
+
+Things to do that can mitigate GPU memory issues:
+- Use gradient checkpointing to save memory during training
+- Use mixed precision training (float16) to reduce memory usage
+- Use smaller batch sizes
+- Use AuroraSmallPretrained model instead of the larger AuroraPretrained model
+
+- Use parameter-efficient fine-tuning (PEFT) methods like LoRA to reduce the number of trainable parameters (freezing some layers, etc.)
+for p in model.parameters():
+    p.requires_grad = False
+then, I'll unfreeze the lightweight parts,
+
+- lon: 32 longitudes from 0° to 360° (excluding the duplicate at 360°)
+- time: just one timestamp (2020-06-01 12:00 UTC)
+- atmos_levels: pressure levels (hPa)
+
+- choose only one of the atmospheric pressure levels for fine-tuning (e.g., 500 hPa) 
+- choose only one hydrological variable to predict (e.g. tp, pr, rain_rate)
+- choose only one region (e.g., North America) instead of the whole globe ?

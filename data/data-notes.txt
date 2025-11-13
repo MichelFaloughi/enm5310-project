@@ -1,0 +1,2 @@
+TODO:
+- Maybe come up with a function to pretty print a Batch into a dataframe or tabular data of some sort. Is that feasible ? Memory-wise ? Is it already done ? Check the Batch.py file
