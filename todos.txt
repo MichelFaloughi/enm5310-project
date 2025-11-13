@@ -37,7 +37,23 @@ for p in model.parameters():
 then, I'll unfreeze the lightweight parts,
 
 - choose a specific region or grid point ?
-- (NO) choose only one of the atmospheric pressure levels for fine-tuning (e.g., 500 hPa).vertical structure matters for rain, memory savings would be minimal
-- (YES) choose only one hydrological variable to predict (e.g. tp, pr, rain_rate). Choose tp (total precipitation) since it's the most general
+- (NO) choose only one of the atmospheric pressure levels for fine-tuning (e.g., 500 hPa).vertical structure matters for rain, memory savings would be minimal. use all the ones from the aurorasmallpretrained
+- (YES) choose only one hydrological variable to predict (e.g. tp, pr, rain_rate). Choose tp (total precipitation) since it's the most general. visualize and see
 - (PROBABLY) choose only one region (e.g., North America) instead of the whole globe ?
 - (YES) don't aim for long lead times, stick to one (e.g., 6 hours ahead). Multi-step rollouts can come later if you have time
+
+
+
+
+
+notes from the meeting:
+- model was trained in 3 phases: pre-training, then finetuning was in two phases, the one-step was phase one, then rollouts was phase 2
+- for our purposes, stick to one step, if you're fancy later see rollouts (but memory is gonna grow). rollout fine-tuning, is tricky, there are tricks they use you can read the aurora paper. (replay)
+- so how they fine-tune the one step, they fine-tune one the full model , we can do that with AuroraSmallPretrained
+- use data from 2016-2024 then test 2024-2025. (flexible) 
+- the small model has 13 pressure levels ? use all of them
+- we have to compute the normalization statistics for precipitation !!!
+- tp is non negative, so how do you model this ? a probability type fo outcome ? ...
+- maybe starting point would be to predict precipitation alone, then after to be able to predict all the other variables. because tp depends on other variables
+- tp is a special case, see how others have made it
+follow what ppl have done in the literature
