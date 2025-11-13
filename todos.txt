@@ -1,7 +1,10 @@
 Proposal:
 Base model: AuroraSmallPretrained at 0.4° resolution.
 Domain: a cropped region (e.g. Europe) rather than global.
-Inputs: same Aurora state variables (2t, 10u, 10v, msl, t, u, v, z, q at all 4 levels).
+Inputs: same Aurora state variables (surface:2t, 10u, 10v, msl,
+                                    static:lsm, slt, z
+                                    atmos: t, u, v, z, q 
+                                    meta: all 13 levels).
 Target: one new surface variable tp = 6-hour accumulated total precipitation.
 Training: parameter-efficient fine-tuning:
 freeze backbone
@@ -27,7 +30,7 @@ Questions for Prof. Paris:
 
 Things to do that can mitigate GPU memory issues:
 - Use gradient checkpointing to save memory during training
-- Use mixed precision training (float16) to reduce memory usage
+- Use mixed precision training (float16) to reduce memory usage (model = Aurora(autocast=True?))
 - (YES) Use smaller batch sizes
 - (YES) Use AuroraSmallPretrained model instead of the larger AuroraPretrained model
 
