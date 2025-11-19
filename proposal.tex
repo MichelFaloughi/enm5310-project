@@ -1,0 +1,90 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.85in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{cite}
+\usepackage{titlesec}
+
+% Reduce spacing
+\titlespacing*{\section}{0pt}{0.5em}{0.3em}
+\titlespacing*{\subsection}{0pt}{0.4em}{0.2em}
+\setlength{\parskip}{0.3em}
+\setlength{\itemsep}{0.1em}
+\setlength{\parsep}{0.1em}
+
+\title{Fine-Tuning Aurora Weather Foundation Model for Precipitation Prediction\\[0.2em]
+\large ENM 5310: Data-driven Modelling and Probabilistic Scientific Computing}
+\author{Michel Faloughi}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\vspace{-0.3cm}
+
+\section{Problem Overview and Importance}
+
+Weather prediction is important for many applications, and foundation models like Microsoft's Aurora have demonstrated strong performance in predicting standard weather variables such as temperature, wind, and pressure. However, Aurora does not predict precipitation, which is one of the most societally relevant weather variables. Precipitation prediction is challenging because it is highly non-linear, often zero (sparse), and depends on complex interactions across different atmospheric levels.
+
+I propose to fine-tune Aurora to predict 6-hour accumulated total precipitation ($tp$). A key constraint is that I have access to an 8GB GPU, which makes full model fine-tuning infeasible. I will therefore employ parameter-efficient fine-tuning methods. The central question I aim to address is: how well can we predict rainfall after fine-tuning with limited GPU memory?
+
+\section{Challenges to be Addressed}
+
+Several key challenges must be addressed:
+
+\textbf{GPU Memory Constraints:} Aurora models are large-scale and require significant GPU memory. I have access to an 8GB RTX 4070 laptop GPU, which makes full model fine-tuning infeasible. I will therefore freeze most of the model and only train a small subset of parameters.
+
+\textbf{Precipitation Modeling Challenges:} Precipitation is always non-negative, exhibits a highly skewed distribution (many zeros with occasional large values), and depends on complex interactions between different atmospheric variables. The optimal loss function remains to be determined---standard MSE may not be appropriate. I will investigate approaches used in the literature for similar problems.
+
+\textbf{Normalization:} I need to compute normalization statistics specifically for precipitation, which has different statistical properties than the variables Aurora was originally trained on. This requirement was identified in discussions with my advisor.
+
+\textbf{Regional vs Global:} I plan to focus on a specific region (likely Europe) rather than the entire globe. This approach should reduce memory requirements and may yield better results for the selected region, though this will be evaluated during the project.
+
+\section{Current State-of-the-Art and Limitations}
+
+The main weather foundation models I've looked at are: \textbf{Aurora} (Microsoft)---pre-trained on ERA5 data (1979-2021), but doesn't predict precipitation at all; \textbf{GraphCast} (Google DeepMind)---can predict precipitation, but requires full model retraining; \textbf{Pangu-Weather} (Huawei)---similar issue, doesn't predict precipitation well; and \textbf{FourCastNet}---does predict precipitation, but uses a completely different architecture.
+
+The issue is that while Aurora demonstrates strong performance on standard meteorological variables, it does not predict precipitation. Other models either do not handle precipitation well or would require full model retraining from scratch, which is not feasible given my computational constraints. I therefore propose to extend Aurora's capabilities by fine-tuning only a small portion of the model to add precipitation prediction.
+
+\section{Mathematical Formulation and Technical Approach}
+
+\subsection{Problem Definition}
+
+I have a pre-trained Aurora model that takes in weather state variables and predicts standard meteorological variables. I aim to add a new output that predicts 6-hour accumulated total precipitation $tp$. The input $\mathbf{x}_t$ at time $t$ includes: surface variables (2m temperature 2t, 10m u-wind 10u, 10m v-wind 10v, mean sea level pressure msl), static variables (land-sea mask lsm, geopotential z, soil type slt), and atmospheric variables (temperature t, u-wind u, v-wind v, geopotential z, specific humidity q) at 13 pressure levels (100, 250, 500, 850 hPa, etc.). The target is to predict $tp_{t+6}$ (precipitation 6 hours ahead), which is always non-negative.
+
+\subsection{Technical Approach}
+
+\textbf{Parameter-Efficient Fine-Tuning:} I will freeze the encoder/backbone of Aurora and train only a new head that outputs precipitation predictions, potentially along with lightweight decoder layers if needed. The frozen encoder will provide learned representations, and I will learn a mapping function from these representations to precipitation. Only this new component will have trainable parameters.
+
+\textbf{Training Plan:} I will use ERA5 reanalysis data from 2016-2024 for training and 2024-2025 for testing (this split is flexible based on advisor suggestions). The base model will be AuroraSmallPretrained at 0.4° resolution, selected due to GPU memory constraints. I plan to use a cropped regional domain (likely Europe) to reduce memory requirements. To manage memory, I will employ mixed precision training (FP16), gradient checkpointing, and a batch size of 1. The loss function will be determined through investigation of the literature, with consideration of log-space regression given precipitation's non-negative and sparse nature. I will compute normalization statistics for precipitation from the training data.
+
+\textbf{Implementation:} I will use PyTorch and the Aurora library. The choice between using LoRA (Low-Rank Adaptation) via HuggingFace's PEFT library versus manually freezing parameters will be determined based on initial experiments. I plan to begin with a simpler approach and iterate as needed.
+
+\section{Potential Impact}
+
+Upon successful completion, this project could have several benefits:
+
+\textbf{For Weather Prediction:} Extending Aurora to predict precipitation would make it more complete and useful. Precipitation is critical for practical applications, and achieving reasonable predictions without full model retraining would represent a valuable contribution.
+
+\textbf{For Researchers with Limited Computational Resources:} Most published work on weather foundation models uses high-end GPUs (such as A100s with 80GB memory). This project aims to demonstrate that useful fine-tuning is feasible with a standard laptop GPU, which could benefit students and researchers without access to expensive hardware.
+
+\textbf{For Learning:} This project will provide experience with fine-tuning large models, parameter-efficient methods, and handling challenging prediction problems involving non-negative, sparse variables. This experience will be valuable for future work with foundation models.
+
+The central question I aim to address is: \textit{How well can we predict rainfall after fine-tuning with an 8GB GPU?} While the effectiveness remains to be determined, I believe this is a worthwhile investigation that will provide valuable insights regardless of the outcome.
+
+\vspace{-0.2cm}
+\section*{References}
+\vspace{-0.1cm}
+\begin{itemize}
+    \setlength{\itemindent}{-0.2cm}
+    \item Microsoft Aurora: \url{https://microsoft.github.io/aurora/}
+    \item Lam, R., et al. "GraphCast: Learning skillful medium-range global weather forecasting." Science, 2023.
+    \item Bi, K., et al. "Accurate medium-range global weather forecasting with 3D neural networks." Nature, 2023.
+    \item Pathak, J., et al. "FourCastNet: A Global Data-driven High-resolution Weather Model using Adaptive Fourier Neural Operators." arXiv, 2022.
+    \item Lehmann, F., et al. "Finetuning a Weather Foundation Model with Lightweight Decoders for Unseen Physical Processes." arXiv preprint arXiv:2506.19088, 2025.
+\end{itemize}
+
+\end{document}
+
