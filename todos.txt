@@ -22,9 +22,10 @@ answer: Yes, freezing parameters means that you do not update them at all during
 - How to implement LoRA with Aurora ? Is there an example anywhere ?
 answer: Not that I know of, but you can use the PEFT library from HuggingFace to implement LoRA with Aurora. You would need to define a LoRA configuration and then wrap the Aurora model with it.
 - Should I used the PEFT library from HuggingFace ? or the fine tuning functions from Aurora directly ? or both ?
-
-Questions for Prof. Paris:
-- (i guess we have no choice) Use AuroraSmallPretrained ? they don't recommend using it, but maybe for fine-tuning it's okay ? What did the guys from the paper use ?
+- What's a latent space ? 
+answer: A latent space is a lower-dimensional representation of the data that captures its essential features. In the context of machine learning, it is often used to reduce the dimensionality of the input data and make it easier to learn patterns.
+- Is it the above the same as an embedding space ?
+answer: Yes, an embedding space is a type of latent space where the data is represented as vectors in a continuous space.
 
 
 
