@@ -19,3 +19,7 @@ Resources and links:
 - https://jupyterhub.seas.upenn.edu/
 - https://github.com/microsoft/aurora/issues/155 about precipiations !
 
+Things to mention in the report:
+- Precipitation is one of the hardest variables to learn (highly nonlinear, intermittent, multi-scale)
+
+- 
