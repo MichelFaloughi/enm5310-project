@@ -3,3 +3,12 @@ zz_other/
 
 # era5 data
 era5_sample/
+
+# Data directories
+data_raw/
+data_proc/
+
+# Data files
+*.nc
+*.zarr
+*.zarr.zip
